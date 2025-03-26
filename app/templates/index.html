@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Habit Tracker</title>
+</head>
+<body>
+    <h1>Habit Tracker</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(size=30) }}
+        </p>
+        <p>
+            {{ form.frequency.label }}<br>
+            {{ form.frequency() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+    <hr>
+
+<h2>Your Habits</h2>
+<ul>
+    {% for habit in habits %}
+
+
+
+            <li>
+            <strong>{{ habit.name }}</strong> ({{ habit.frequency }})<br>
+            ✅ Completions: {{ stats[habit.id].total }}<br>
+            🔁 Current streak: {{ stats[habit.id].current_streak }} days<br>
+            🔥 Longest streak: {{ stats[habit.id].longest_streak }} days<br>
+            📅 Completion rate: {{ stats[habit.id].completion_rate }}%
+
+            {% set completed_today = habit.progress_entries.filter_by(date=today).first() %}
+            {% if completed_today %}
+               <br> ✅ Done today <br>
+            {% else %}
+                <form method="POST" action="{{ url_for('main.mark_done', habit_id=habit.id) }}" style="display:inline;">
+                    <button type="submit">Mark Done</button>
+                </form>
+        </li>
+                    {% endif %}
+           <form method="POST" action="{{ url_for('main.delete_habit', habit_id=habit.id) }}" style="display:inline;">
+                  <button type="submit" onclick="return confirm('Are you sure you want to delete this habit?');">Delete</button>
+</form>
+
+    {% else %}
+        <li>No habits yet.</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
